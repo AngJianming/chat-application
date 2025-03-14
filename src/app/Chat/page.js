@@ -14,16 +14,35 @@ const ChatPage = ({ back, title }) => {
 
     //useState initialization
     //Start here
+    const [value, setValue] = useState('');
+    const [posts, setPosts] = useState([]);
+    const isSubscribed = useRef(false);
 
     const fetchPosts = async () => {
         //fetch Posts function
+        const response = await fetch('http://localhost:3000/api/posts');
+        const data = await response.json()
+        setPosts(data.items)
     };
 
     const submitPost = async () => {
         //submit Post function
+        const response = await fetch('http://localhost:3000/api/posts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                content: value,
+                likes: 0,
+                user: userStore, id,
+            })
+        });
+        setValue('');
     };
 
     //useEffect for Fetching Messages
+    useEffect(() => {
+        fetchPosts();
+    }, []);
 
     // /useEffect for Real-Time Updates
     useEffect(() => {
@@ -123,6 +142,15 @@ const ChatPage = ({ back, title }) => {
                 <div className='flex lg:flex-col-reverse'>
                     <div className='flex-grow mr-30'>
                         {/* Comment section  */}
+                        <Comment 
+                            avatar='/images/avatars/avatar.jpeg'
+                            placeholder='Type to add something'
+                            setValue={(e) => setValue(e.target.value)}
+                            posts={posts}
+                            submitFunc={submitPost}
+                            
+                        />
+                        
                     </div>
                 </div>
             </div>
